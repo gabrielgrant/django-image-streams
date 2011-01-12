@@ -1,0 +1,52 @@
+Installation:
+
+pip install django-image-streams
+add to installed apps list
+
+Usage:
+
+Basic usage
+
+{% image_stream "news.image.image" %}
+{% image_stream "news.image.image" 5 %}
+
+
+custom queryset:
+
+{% image_stream "news:my_image_stream" %}
+
+
+# models.py
+
+try:
+    from image_stream import register
+    register('my_image_stream', queryset=Image.objects.filter(published=True), field='image', number=5)
+except ImportError:
+    pass
+
+
+image_streams = {
+	'my_image_stream': {
+		'queryset': Image.objects.filter(published=True),
+		'field': 'image',
+		'number': 5,
+	}
+}
+
+
+override the number of images displayed:
+
+{% image_stream "news:my_image_stream" 10 %}
+
+
+creating image streams without editing an app
+
+# in settings.py
+IMAGE_STREAMS = {
+	'global_news_image_set' : {
+		'model': 'news.image',
+		'filter_queryset': lambda i: i.objects.filter(published=True),
+		'field': 'image',
+		'number': 5,
+	}
+}

@@ -11,9 +11,7 @@ class ImageStream(object):
 		app_label defaults to the name of the app containing the model
 		if app_label is None, the image stream will be in the global namespace
 		'''
-		if app_label is None or app_label:
-			self.app_name = app_name
-		else:
+		if self.app_label == '':
 			self.app_label = self.get_queryset().model._meta.module_name
 		self.name = name
 		self.registry = registry
@@ -25,10 +23,13 @@ class ImageStream(object):
 			return self.model.objects.all()
 		else:
 			raise RuntimeError('either model or queryset must be specified')
-	def filter_query_set(self, qs):
+	def filter_queryset(self, qs):
 		return qs
 	def get_filtered_queryset(self):
-		return self.filter_query_set(self.get_query_set())	
+		return self.filter_queryset(self.get_queryset())
+	def get_images(self):
+		qs = self.get_filtered_queryset()
+		return qs.values_list(self.field_name, flat=True)
 
 class ImageStreamRegistry(object):
 	def __init__(self, name=None):
@@ -59,8 +60,9 @@ class ImageStreamRegistry(object):
 			# the created class appears to "live" in the wrong place,
 			# which causes issues later on.
 			options['__module__'] = __name__
-			stream_class = type("%Stream" % name, (stream_class,), options)
-		stream_instance = stream_class(name)
+			class_name = str("%sStream" % name)  # Python 2.x needs str
+			stream_class = type(class_name, (stream_class,), options)
+		stream_instance = stream_class(name, self)
 		
 		if stream_instance.app_label is None:
 			key = name
@@ -68,16 +70,16 @@ class ImageStreamRegistry(object):
 			key = '%s:%s' % (stream_instance.app_label, name)
 		self._registry[key] = stream_instance
 	
-	def fetch_stream(key):
+	def fetch_stream(self, key):
 		if key not in self._registry:
 			# try to retrieve the object, and add it to the registry
-			app_label, model_name, field = key.split('.')
-			kwargs = {'field': field}
+			app_label, model_name, field_name = key.split('.')
+			kwargs = {'field_name': field_name}
 			kwargs['model'] = ContentType.objects.get(
-				app_label=app_label, model=model
+				app_label=app_label, model=model_name
 			).model_class()
 			# register globally, *not* within the app label namespace
-			self._register(name=key, app_label=None, **kwargs)
+			self._register(name=key, registry=self, app_label=None, **kwargs)
 		return self._registry[key]
 
 registry = ImageStreamRegistry()

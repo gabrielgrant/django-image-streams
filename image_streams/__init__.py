@@ -1,5 +1,5 @@
 from django.conf import settings
-from image_stream.stream_registry import registry
+from image_streams.stream_registry import registry
 from django.contrib.contenttypes.models import ContentType
 
 def register_from_settings():

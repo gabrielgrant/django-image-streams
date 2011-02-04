@@ -27,9 +27,6 @@ class ImageStream(object):
 		return qs
 	def get_filtered_queryset(self):
 		return self.filter_queryset(self.get_queryset())
-	def get_images(self):
-		qs = self.get_filtered_queryset()
-		return qs.values_list(self.field_name, flat=True)
 
 class ImageStreamRegistry(object):
 	def __init__(self, name=None):

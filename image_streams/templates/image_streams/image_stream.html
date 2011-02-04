@@ -16,8 +16,10 @@ $(load_carousel);
 <div style="padding-left:50%;">
 <div class="art_stream" style="margin-left:-140px;">
 <ul>
-{% for i in images %}
-<li style="height:280px;width:280px; text-align:center;margin:0;padding:0;"><a href="{{ i.album.tenant.get_absolute_url }}"><img src="{{ i.stream_full.url }}" alt="{{ i.title }}" style="background: white; padding: 4px; border:1px solid #EFEBE8;" /></a></li>
+{% load image_stream_helpers %}
+{% for img in images %}
+<li style="height:280px;width:280px; text-align:center;margin:0;padding:0;">
+{% if link %}<a href="{% resolve link %}">{% endif %}<img src="{% resolve src %}" alt="{% resolve title %}" style="background: white; padding: 4px; border:1px solid #EFEBE8;" />{% if link %}</a>{% endif %}</li>
 {% endfor %}
 </ul>
 </div>

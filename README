@@ -1,15 +1,19 @@
 Installation:
 
 pip install django-image-streams
-add to installed apps list
+add "image_streams" to the installed apps list
 
 Usage:
 
 Basic usage
 
-{% image_stream "news.image.image" %}
-{% image_stream "news.image.image" 5 %}
+  {% load image_streams %}
 
+  {% image_stream "news.image" 5 "image_field" "title_field" "link_field" %}
+
+image model; number of images; model field that contains the image; optional title and link.
+
+**Nothing below here is fully implemented**
 
 custom queryset:
 

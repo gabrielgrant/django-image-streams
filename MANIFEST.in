@@ -1,0 +1,5 @@
+include MANIFEST.in
+include README
+include TODO
+recursive-include image_streams/templates/ *.html
+recursive-include image_streams/static/ *.js *.png 

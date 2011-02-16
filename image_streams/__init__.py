@@ -13,9 +13,3 @@ def register_from_settings():
 		# register globally, *not* within the app label namespace
 		registry.register(name=name, app_label=None, **kwargs)
 
-def register(name, queryset, field, number=None):
-	kwargs = {'queryset':queryset, 'field':field}
-	if number is not None:
-		kwargs['number'] = number
-	registry.register(name, **kwargs)
-

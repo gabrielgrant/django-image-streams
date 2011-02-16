@@ -6,13 +6,14 @@ py_identifier_re = re.compile(r'^[a-zA-Z_][\w]*$')
 class ImageStream(object):
 	number = 10
 	app_label=''
+	img_attr, title_attr, link_attr = '', '', '',
 	def __init__(self, name, registry):
 		'''
 		app_label defaults to the name of the app containing the model
 		if app_label is None, the image stream will be in the global namespace
 		'''
 		if self.app_label == '':
-			self.app_label = self.get_queryset().model._meta.module_name
+			self.app_label = self.get_queryset().model._meta.app_label
 		self.name = name
 		self.registry = registry
 	
@@ -27,6 +28,8 @@ class ImageStream(object):
 		return qs
 	def get_filtered_queryset(self):
 		return self.filter_queryset(self.get_queryset())
+	def get_attrs(self):
+		return self.img_attr, self.title_attr, self.link_attr
 
 class ImageStreamRegistry(object):
 	def __init__(self, name=None):
@@ -35,12 +38,12 @@ class ImageStreamRegistry(object):
 		self.name = name
 		self._registry = {} # stream_identifier -> stream_class instance
 	
-	def register(self, name, stream_class=None, **options):
+	def register(self, name, stream_class=None, app_label=None, **options):
 		if app_label is not None and py_identifier_re.match(app_label) is None:
 			raise ValueError('app_label must be a valid Python identifier')
 		if py_identifier_re.match(name) is None:
 			raise ValueError('name must be a valid Python identifier')
-		_register(self, name, stream_class=None, **options)
+		self._register(name, **options)
 		
 	def _register(self, name, stream_class=None, **options):
 		'''

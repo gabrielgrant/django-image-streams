@@ -5,28 +5,77 @@ add "image_streams" to the installed apps list
 
 Usage:
 
-Basic usage
+To insert an image stream into your template, you will use the `image_stream`
+template tag, which is contained in the image_streams library.
 
-  {% load image_streams %}
+To load the tag from the library, insert `{% load image_streams %}` into
+your template.
+
+There are two ways to use the tag: either by pre-registering the image
+stream's parameters under a unique name (registered usage), or by
+specifying all parameters when inserting the tag into the
+template (unregistered usage).
+
+Unregistered usage requires no setup before hand, and so is very easy
+to get started with. Simply insert the `image_stream` tag into your template:
 
   {% image_stream "news.image" 5 "image_field" "title_field" "link_field" %}
 
 image model; number of images; model field that contains the image; optional title and link.
 
-**Nothing below here is fully implemented**
+another, slightly more comple example:
 
-custom queryset:
+{% image_stream "tenants.image" 10 "stream" "title" "album.tenant.get_absolute_url" %}
 
-{% image_stream "news:my_image_stream" %}
+
+Registered usage requires a slight bit of setup before inserting the tag,
+but it simplifies what has to be inserted into the template itself, and
+can also handle more complex scenarios.
+
+To begin, you must register a new image stream. It is often easiest to
+do this within your models.py somewhere below where the relevant image
+model is defined.
 
 
 # models.py
 
 try:
-    from image_stream import register
-    register('my_image_stream', queryset=Image.objects.filter(published=True), field='image', number=5)
+    from image_stream import registry
+    qs = Image.objects.filter(published=True)
+    registry.register('my_image_stream', queryset=qs, img_attr='image', number=5)
 except ImportError:
     pass
+
+
+now the image stream templatetag can be used by refering to the stream
+by name
+
+{% image_stream "news:my_image_stream" %}
+
+
+The attributes can are treated as they would be in a template ie they
+can follow relationships and call methods. For example, the following
+example would call the `get_absolute_url` method on the linked Album
+model to get a link
+
+try:
+	from image_streams import registry
+	qs = Image.objects.select_related(depth=1)
+	attrs = dict(img_attr='stream', title_attr='title',
+		link_attr='album.get_absolute_url'
+	)
+	registry.register('all_album_images', queryset=qs, **attrs)
+except ImportError:
+	pass
+
+
+Notice that queryset's "select_related" method was used. This is strongly
+recommended when fetching attributes off linked models, since without it,
+an extra query must be performed for each image fetched.
+
+
+
+**Nothing below here is fully implemented**
 
 
 image_streams = {

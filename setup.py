@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='django-image-streams',
-    version='0.1.0dev',
+    version='0.2.0dev',
     packages=['image_streams',],
     include_package_data=True,
     author='Gabriel Grant',

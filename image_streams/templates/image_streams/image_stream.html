@@ -20,7 +20,7 @@ $(load_carousel);
 {% load image_stream_helpers %}
 {% for img in images %}
 <li style="height:280px;width:280px; text-align:center;margin:0;padding:0;">
-{% if link %}<a href="{% resolve link %}">{% endif %}<img src="{% resolve src %}" alt="{% resolve title %}" style="background: white; padding: 4px; border:1px solid #EFEBE8;" />{% if link %}</a>{% endif %}</li>
+{% if link %}<a href="{% resolve link %}">{% endif %}<img src="{% resolve src %}" alt="{% resolve title %}" />{% if link %}</a>{% endif %}</li>
 {% endfor %}
 </ul>
 </div>

@@ -21,6 +21,10 @@ def image_stream(stream_key, number=None,
 	attrs = [('img.%s' % attr if attr else '') for attr in attrs]
 	ctx = dict(zip(['src', 'title', 'link'], attrs))
 	qs = stream.get_filtered_queryset()
+	# django blows up if we try to access a null image, so filter them out
+	# see: https://code.djangoproject.com/ticket/13327 or
+	# http://groups.google.com/group/django-users/browse_frm/thread/471162ba4e515311
+	qs = qs.exclude(**{img_attr.replace('.', '__'): ''})  # filter nulls
 	ctx['images'] = qs.order_by('?')[:number]  # randomly ordered images
 	return ctx
 
